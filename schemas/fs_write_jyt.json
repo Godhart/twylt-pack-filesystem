@@ -1,0 +1,143 @@
+{
+  "format_version": "1.8",
+  "name": "fs_write_jyt",
+  "version": "0.5.0",
+  "description": "Serialize a JSON-compatible structure as JSON, YAML or TOML.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "data": {
+        "$ref": "#/$defs/JsonValue",
+        "description": "JSON-compatible structure; TOML requires an object and cannot represent null."
+      },
+      "format": {
+        "default": "auto",
+        "description": "auto infers format from extension.",
+        "enum": [
+          "auto",
+          "json",
+          "yaml",
+          "toml"
+        ],
+        "title": "Format",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "utf-8",
+        "description": "Explicit Python codec; use UTF-8 for interoperable JSON/YAML/TOML.",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "overwrite": {
+        "default": false,
+        "description": "Explicitly allow replacing an existing regular file.",
+        "title": "Overwrite",
+        "type": "boolean"
+      },
+      "create_parents": {
+        "default": false,
+        "description": "Create missing parent directories.",
+        "title": "Create Parents",
+        "type": "boolean"
+      },
+      "indent": {
+        "default": 2,
+        "description": "Indentation for JSON/YAML; TOML writer controls its own layout.",
+        "maximum": 8,
+        "minimum": 1,
+        "title": "Indent",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "path",
+      "data"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_write_jyt.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "operation": {
+        "title": "Operation",
+        "type": "string"
+      },
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "source": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Source"
+      },
+      "changed": {
+        "title": "Changed",
+        "type": "boolean"
+      },
+      "bytes_written": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bytes Written"
+      }
+    },
+    "required": [
+      "operation",
+      "path",
+      "changed"
+    ],
+    "title": "MutationResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_write_jyt.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "settings.toml",
+        "data": {
+          "enabled": true,
+          "name": "demo"
+        }
+      },
+      "output": {
+        "operation": "write_jyt",
+        "path": "/settings.toml",
+        "source": null,
+        "changed": true,
+        "bytes_written": null
+      }
+    }
+  ]
+}

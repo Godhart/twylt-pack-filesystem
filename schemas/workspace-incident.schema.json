@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:twylt:workspace-incident:1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event",
+    "schema_version",
+    "timestamp",
+    "incident_id",
+    "tool",
+    "pid",
+    "action",
+    "code"
+  ],
+  "properties": {
+    "event": {
+      "const": "workspace_incident"
+    },
+    "schema_version": {
+      "const": "1.0"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "incident_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tool": {
+      "type": "string"
+    },
+    "pid": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "action": {
+      "const": "deny"
+    },
+    "code": {
+      "enum": [
+        "workspace_not_configured",
+        "invalid_workspace_root",
+        "filesystem_root_forbidden",
+        "invalid_incident_log",
+        "incident_log_inside_workspace",
+        "incident_log_unavailable",
+        "path_outside_workspace",
+        "invalid_path_syntax",
+        "invalid_path",
+        "symlink_forbidden",
+        "hardlink_forbidden",
+        "special_file_forbidden",
+        "mount_boundary_forbidden",
+        "workspace_root_mutation_forbidden",
+        "transport_cwd_outside_workspace",
+        "git_config_forbidden",
+        "git_storage_redirection_forbidden",
+        "git_indirect_worktree_forbidden",
+        "git_local_remote_outside_workspace",
+        "git_remote_forbidden",
+        "git_remote_not_configured",
+        "git_symlink_tree_forbidden",
+        "invalid_repository_relative_path",
+        "git_metadata_path_forbidden"
+      ]
+    },
+    "original_code": {
+      "enum": [
+        "workspace_not_configured",
+        "invalid_workspace_root",
+        "filesystem_root_forbidden",
+        "invalid_incident_log",
+        "incident_log_inside_workspace",
+        "incident_log_unavailable",
+        "path_outside_workspace",
+        "invalid_path_syntax",
+        "invalid_path",
+        "symlink_forbidden",
+        "hardlink_forbidden",
+        "special_file_forbidden",
+        "mount_boundary_forbidden",
+        "workspace_root_mutation_forbidden",
+        "transport_cwd_outside_workspace",
+        "git_config_forbidden",
+        "git_storage_redirection_forbidden",
+        "git_indirect_worktree_forbidden",
+        "git_local_remote_outside_workspace",
+        "git_remote_forbidden",
+        "git_remote_not_configured",
+        "git_symlink_tree_forbidden",
+        "invalid_repository_relative_path",
+        "git_metadata_path_forbidden"
+      ]
+    },
+    "requested_path": {
+      "type": "string",
+      "maxLength": 1024
+    }
+  }
+}

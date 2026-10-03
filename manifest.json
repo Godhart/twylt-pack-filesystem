@@ -1,0 +1,85 @@
+{
+  "name": "filesystem-twylt-pack",
+  "version": "0.5.0",
+  "protocol": "TWYLT 1",
+  "tools": [
+    {
+      "name": "fs_stat",
+      "entrypoint": "tools/fs_stat/tool.py",
+      "bootstrap": "tools/fs_stat/run.py",
+      "description": "Report file bytes, text/binary/unknown classification and exact text line count."
+    },
+    {
+      "name": "fs_chmod",
+      "entrypoint": "tools/fs_chmod/tool.py",
+      "bootstrap": "tools/fs_chmod/run.py",
+      "description": "Set exact POSIX permissions on one workspace file or directory."
+    },
+    {
+      "name": "fs_list",
+      "entrypoint": "tools/fs_list/tool.py",
+      "bootstrap": "tools/fs_list/run.py",
+      "description": "List directory entries with bounded depth, filters and pagination."
+    },
+    {
+      "name": "fs_glob",
+      "entrypoint": "tools/fs_glob/tool.py",
+      "bootstrap": "tools/fs_glob/run.py",
+      "description": "Search relative paths using a POSIX glob and shared metadata filters."
+    },
+    {
+      "name": "fs_find",
+      "entrypoint": "tools/fs_find/tool.py",
+      "bootstrap": "tools/fs_find/run.py",
+      "description": "Find objects recursively by metadata and optional full-text content filter."
+    },
+    {
+      "name": "fs_read",
+      "entrypoint": "tools/fs_read/tool.py",
+      "bootstrap": "tools/fs_read/run.py",
+      "description": "Read a line slice with explicit encoding or heuristic detection."
+    },
+    {
+      "name": "fs_read_jyt",
+      "entrypoint": "tools/fs_read_jyt/tool.py",
+      "bootstrap": "tools/fs_read_jyt/run.py",
+      "description": "Read JSON, YAML or TOML into a JSON-compatible data structure."
+    },
+    {
+      "name": "fs_read_markdown",
+      "entrypoint": "tools/fs_read_markdown/tool.py",
+      "bootstrap": "tools/fs_read_markdown/run.py",
+      "description": "Parse CommonMark plus tables and strikethrough into a nested token AST."
+    },
+    {
+      "name": "fs_write",
+      "entrypoint": "tools/fs_write/tool.py",
+      "bootstrap": "tools/fs_write/run.py",
+      "description": "Create or explicitly replace a text file."
+    },
+    {
+      "name": "fs_write_jyt",
+      "entrypoint": "tools/fs_write_jyt/tool.py",
+      "bootstrap": "tools/fs_write_jyt/run.py",
+      "description": "Serialize a JSON-compatible structure as JSON, YAML or TOML."
+    },
+    {
+      "name": "fs_copy",
+      "entrypoint": "tools/fs_copy/tool.py",
+      "bootstrap": "tools/fs_copy/run.py",
+      "description": "Copy a file, directory tree to an exact destination."
+    },
+    {
+      "name": "fs_move",
+      "entrypoint": "tools/fs_move/tool.py",
+      "bootstrap": "tools/fs_move/run.py",
+      "description": "Move a file, directory tree to an exact destination."
+    },
+    {
+      "name": "fs_delete",
+      "entrypoint": "tools/fs_delete/tool.py",
+      "bootstrap": "tools/fs_delete/run.py",
+      "description": "Remove a file or directory, requiring explicit recursive deletion."
+    }
+  ]
+}

@@ -1,0 +1,540 @@
+{
+  "format_version": "1.8",
+  "name": "fs_glob",
+  "version": "0.5.0",
+  "description": "Search relative paths using a POSIX glob and shared metadata filters.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "include_stats": {
+        "default": false,
+        "description": "Attach content stats to regular files on the returned page only.",
+        "title": "Include Stats",
+        "type": "boolean"
+      },
+      "stats_encoding": {
+        "default": "auto",
+        "description": "Codec for included stats; auto recognizes BOM/strict UTF-8, independently of content search encoding.",
+        "minLength": 1,
+        "title": "Stats Encoding",
+        "type": "string"
+      },
+      "stats_max_bytes": {
+        "default": 16777216,
+        "description": "Per-file byte limit for included stats; larger files return unknown without affecting membership.",
+        "maximum": 67108864,
+        "minimum": 1,
+        "title": "Stats Max Bytes",
+        "type": "integer"
+      },
+      "max_depth": {
+        "anyOf": [
+          {
+            "maximum": 1000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Maximum depth; null searches the entire tree, root excluded.",
+        "title": "Max Depth"
+      },
+      "name_regex": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Python regex search on basename, case-sensitive.",
+        "title": "Name Regex"
+      },
+      "type": {
+        "anyOf": [
+          {
+            "enum": [
+              "file",
+              "directory",
+              "symlink",
+              "other"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "lstat object type; symlinks are never followed.",
+        "title": "Type"
+      },
+      "permissions": {
+        "anyOf": [
+          {
+            "pattern": "^[0-7]{3,4}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "POSIX octal mode such as 644 or 0755; unsupported on Windows.",
+        "title": "Permissions"
+      },
+      "permission_match": {
+        "default": "exact",
+        "description": "Compare all mode bits, require all requested bits, or any requested bit.",
+        "enum": [
+          "exact",
+          "all",
+          "any"
+        ],
+        "title": "Permission Match",
+        "type": "string"
+      },
+      "access": {
+        "anyOf": [
+          {
+            "pattern": "^[rwx]{1,3}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Require current process access r/w/x using os.access; not the same as mode bits.",
+        "title": "Access"
+      },
+      "owner": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "POSIX owner username or numeric UID; unsupported on Windows.",
+        "title": "Owner"
+      },
+      "include_hidden": {
+        "default": true,
+        "description": "Include dot names and descend into dot directories; no Windows hidden-attribute handling.",
+        "title": "Include Hidden",
+        "type": "boolean"
+      },
+      "offset": {
+        "default": 0,
+        "description": "Number of matching entries to skip; zero-based.",
+        "minimum": 0,
+        "title": "Offset",
+        "type": "integer"
+      },
+      "limit": {
+        "default": 100,
+        "description": "Maximum entries on this page.",
+        "maximum": 10000,
+        "minimum": 1,
+        "title": "Limit",
+        "type": "integer"
+      },
+      "on_error": {
+        "default": "raise",
+        "description": "Abort on traversal/access failure, or report skipped paths in errors.",
+        "enum": [
+          "raise",
+          "skip"
+        ],
+        "title": "On Error",
+        "type": "string"
+      },
+      "max_entries": {
+        "default": 100000,
+        "description": "Abort after this many visited objects; increase for large trees.",
+        "maximum": 10000000,
+        "minimum": 1,
+        "title": "Max Entries",
+        "type": "integer"
+      },
+      "path_regex": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Additional regex search on root-relative POSIX path.",
+        "title": "Path Regex"
+      },
+      "pattern": {
+        "description": "Relative POSIX glob: *, ?, [], and ** as an entire segment. ** matches zero or more segments.",
+        "minLength": 1,
+        "title": "Pattern",
+        "type": "string"
+      }
+    },
+    "required": [
+      "path",
+      "pattern"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_glob.input",
+    "x-schema-version": "2.1.0"
+  },
+  "outputSchema": {
+    "$defs": {
+      "EntryTWYLTStrict": {
+        "additionalProperties": false,
+        "properties": {
+          "stats": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/FileStatsTWYLTStrict"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Present for regular files when include_stats=true; null otherwise or on a reported stats error."
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "relative_path": {
+            "title": "Relative Path",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "file",
+              "directory",
+              "symlink",
+              "other"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "depth": {
+            "title": "Depth",
+            "type": "integer"
+          },
+          "size": {
+            "title": "Size",
+            "type": "integer"
+          },
+          "modified_ns": {
+            "title": "Modified Ns",
+            "type": "integer"
+          },
+          "permissions": {
+            "title": "Permissions",
+            "type": "string"
+          },
+          "uid": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Uid"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Owner"
+          }
+        },
+        "required": [
+          "path",
+          "relative_path",
+          "name",
+          "type",
+          "depth",
+          "size",
+          "modified_ns",
+          "permissions"
+        ],
+        "title": "EntryTWYLTStrict",
+        "type": "object"
+      },
+      "FileStatsTWYLTStrict": {
+        "additionalProperties": false,
+        "properties": {
+          "size_bytes": {
+            "description": "File size in bytes from filesystem metadata.",
+            "minimum": 0,
+            "title": "Size Bytes",
+            "type": "integer"
+          },
+          "content_type": {
+            "description": "Conservative content classification, not MIME type.",
+            "enum": [
+              "text",
+              "binary",
+              "unknown"
+            ],
+            "title": "Content Type",
+            "type": "string"
+          },
+          "line_count": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact CR/LF/CRLF line count for fully decoded text; null otherwise.",
+            "title": "Line Count"
+          },
+          "encoding": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Codec used when content_type=text; null otherwise.",
+            "title": "Encoding"
+          },
+          "encoding_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "bom",
+                  "utf8",
+                  "explicit"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How encoding was selected for text; auto is a conservative inference, not a certainty.",
+            "title": "Encoding Source"
+          },
+          "line_ending": {
+            "anyOf": [
+              {
+                "enum": [
+                  "lf",
+                  "crlf",
+                  "cr",
+                  "mixed",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Observed newline format; none means no CR/LF; null for non-text.",
+            "title": "Line Ending"
+          },
+          "indentation": {
+            "anyOf": [
+              {
+                "enum": [
+                  "space",
+                  "tab",
+                  "mixed",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Leading spaces/tabs on non-blank lines; mixed across or within lines; null for non-text.",
+            "title": "Indentation"
+          },
+          "reason": {
+            "enum": [
+              "decoded_text",
+              "binary_signature",
+              "binary_controls",
+              "undecodable",
+              "size_limit",
+              "file_changed"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "size_bytes",
+          "content_type",
+          "reason"
+        ],
+        "title": "FileStatsTWYLTStrict",
+        "type": "object"
+      },
+      "ScanErrorTWYLTStrict": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "message"
+        ],
+        "title": "ScanErrorTWYLTStrict",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "entries": {
+        "items": {
+          "$ref": "#/$defs/EntryTWYLTStrict"
+        },
+        "title": "Entries",
+        "type": "array"
+      },
+      "total": {
+        "description": "Exact match count among successfully inspected entries, before pagination.",
+        "title": "Total",
+        "type": "integer"
+      },
+      "offset": {
+        "title": "Offset",
+        "type": "integer"
+      },
+      "limit": {
+        "title": "Limit",
+        "type": "integer"
+      },
+      "next_offset": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Offset"
+      },
+      "scanned": {
+        "title": "Scanned",
+        "type": "integer"
+      },
+      "complete": {
+        "description": "False if any paths were skipped due to errors.",
+        "title": "Complete",
+        "type": "boolean"
+      },
+      "errors": {
+        "items": {
+          "$ref": "#/$defs/ScanErrorTWYLTStrict"
+        },
+        "title": "Errors",
+        "type": "array"
+      },
+      "error_count": {
+        "description": "All skipped errors; errors list is capped at 100.",
+        "title": "Error Count",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "entries",
+      "total",
+      "offset",
+      "limit",
+      "next_offset",
+      "scanned",
+      "complete",
+      "errors",
+      "error_count"
+    ],
+    "title": "SearchResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_glob.output",
+    "x-schema-version": "2.2.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": ".",
+        "pattern": "**/*.py",
+        "type": "file",
+        "limit": 100
+      },
+      "output": {
+        "entries": [],
+        "total": 0,
+        "offset": 0,
+        "limit": 100,
+        "next_offset": null,
+        "scanned": 0,
+        "complete": true,
+        "errors": [],
+        "error_count": 0
+      }
+    }
+  ]
+}

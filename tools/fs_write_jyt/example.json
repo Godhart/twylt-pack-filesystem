@@ -1,0 +1,7 @@
+{
+  "path": "settings.toml",
+  "data": {
+    "enabled": true,
+    "name": "demo"
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "format_version": "1.8",
+  "name": "fs_write",
+  "version": "0.5.0",
+  "description": "Create or explicitly replace a text file.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "content": {
+        "description": "Complete text to write, without implicit newline changes.",
+        "title": "Content",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "utf-8",
+        "description": "Explicit Python codec; auto is not supported for writing.",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "overwrite": {
+        "default": false,
+        "description": "Allow atomic replacement of an existing regular file.",
+        "title": "Overwrite",
+        "type": "boolean"
+      },
+      "create_parents": {
+        "default": false,
+        "description": "Create missing parent directories.",
+        "title": "Create Parents",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "path",
+      "content"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_write.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "operation": {
+        "title": "Operation",
+        "type": "string"
+      },
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "source": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Source"
+      },
+      "changed": {
+        "title": "Changed",
+        "type": "boolean"
+      },
+      "bytes_written": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bytes Written"
+      }
+    },
+    "required": [
+      "operation",
+      "path",
+      "changed"
+    ],
+    "title": "MutationResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_write.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "example.txt",
+        "content": "Hello\n"
+      },
+      "output": {
+        "operation": "write",
+        "path": "/example.txt",
+        "source": null,
+        "changed": true,
+        "bytes_written": 6
+      }
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "format_version": "1.8",
+  "name": "fs_move",
+  "version": "0.5.0",
+  "description": "Move a file, directory tree to an exact destination.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "source": {
+        "description": "Virtual source path within workspace; regular files and directories only.",
+        "minLength": 1,
+        "title": "Source",
+        "type": "string"
+      },
+      "destination": {
+        "description": "Virtual exact destination within workspace, never an implicit containing directory.",
+        "minLength": 1,
+        "title": "Destination",
+        "type": "string"
+      },
+      "overwrite": {
+        "default": false,
+        "description": "Replace an existing regular file only; existing directories/symlinks are refused.",
+        "title": "Overwrite",
+        "type": "boolean"
+      },
+      "create_parents": {
+        "default": false,
+        "description": "Create missing destination parent directories.",
+        "title": "Create Parents",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "source",
+      "destination"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_move.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "operation": {
+        "title": "Operation",
+        "type": "string"
+      },
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "source": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Source"
+      },
+      "changed": {
+        "title": "Changed",
+        "type": "boolean"
+      },
+      "bytes_written": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bytes Written"
+      }
+    },
+    "required": [
+      "operation",
+      "path",
+      "changed"
+    ],
+    "title": "MutationResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_move.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "source": "example.txt",
+        "destination": "example-moved.txt"
+      },
+      "output": {
+        "operation": "move",
+        "path": "/example-moved.txt",
+        "source": "/example.txt",
+        "changed": true,
+        "bytes_written": null
+      }
+    }
+  ]
+}

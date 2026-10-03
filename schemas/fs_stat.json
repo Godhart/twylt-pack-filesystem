@@ -1,0 +1,193 @@
+{
+  "format_version": "1.8",
+  "name": "fs_stat",
+  "version": "0.5.0",
+  "description": "Report file bytes, text/binary/unknown classification and exact text line count.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "auto",
+        "description": "auto recognizes BOM or strict UTF-8; use an explicit codec for other encodings.",
+        "minLength": 1,
+        "title": "Encoding",
+        "type": "string"
+      },
+      "max_bytes": {
+        "default": 16777216,
+        "description": "Maximum bytes read for exact classification/line count; larger files return unknown.",
+        "maximum": 67108864,
+        "minimum": 1,
+        "title": "Max Bytes",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_stat.input",
+    "x-schema-version": "1.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "size_bytes": {
+        "description": "File size in bytes from filesystem metadata.",
+        "minimum": 0,
+        "title": "Size Bytes",
+        "type": "integer"
+      },
+      "content_type": {
+        "description": "Conservative content classification, not MIME type.",
+        "enum": [
+          "text",
+          "binary",
+          "unknown"
+        ],
+        "title": "Content Type",
+        "type": "string"
+      },
+      "line_count": {
+        "anyOf": [
+          {
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Exact CR/LF/CRLF line count for fully decoded text; null otherwise.",
+        "title": "Line Count"
+      },
+      "encoding": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Codec used when content_type=text; null otherwise.",
+        "title": "Encoding"
+      },
+      "encoding_source": {
+        "anyOf": [
+          {
+            "enum": [
+              "bom",
+              "utf8",
+              "explicit"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "How encoding was selected for text; auto is a conservative inference, not a certainty.",
+        "title": "Encoding Source"
+      },
+      "line_ending": {
+        "anyOf": [
+          {
+            "enum": [
+              "lf",
+              "crlf",
+              "cr",
+              "mixed",
+              "none"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Observed newline format; none means no CR/LF; null for non-text.",
+        "title": "Line Ending"
+      },
+      "indentation": {
+        "anyOf": [
+          {
+            "enum": [
+              "space",
+              "tab",
+              "mixed",
+              "none"
+            ],
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "description": "Leading spaces/tabs on non-blank lines; mixed across or within lines; null for non-text.",
+        "title": "Indentation"
+      },
+      "reason": {
+        "enum": [
+          "decoded_text",
+          "binary_signature",
+          "binary_controls",
+          "undecodable",
+          "size_limit",
+          "file_changed"
+        ],
+        "title": "Reason",
+        "type": "string"
+      },
+      "path": {
+        "title": "Path",
+        "type": "string"
+      }
+    },
+    "required": [
+      "size_bytes",
+      "content_type",
+      "reason",
+      "path"
+    ],
+    "title": "StatResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_stat.output",
+    "x-schema-version": "1.1.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "example.txt"
+      },
+      "output": {
+        "path": "/example.txt",
+        "size_bytes": 6,
+        "content_type": "text",
+        "line_count": 1,
+        "encoding": "utf-8",
+        "encoding_source": "utf8",
+        "line_ending": "lf",
+        "indentation": "none",
+        "reason": "decoded_text"
+      }
+    }
+  ]
+}

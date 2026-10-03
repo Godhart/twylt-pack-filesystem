@@ -1,0 +1,144 @@
+{
+  "format_version": "1.8",
+  "name": "fs_read",
+  "version": "0.5.0",
+  "description": "Read a line slice with explicit encoding or heuristic detection.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "auto",
+        "description": "Python codec name or auto (BOM, strict UTF-8, then heuristic detector).",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "max_bytes": {
+        "default": 16777216,
+        "description": "Maximum entire source file size to decode, even for a line slice.",
+        "maximum": 67108864,
+        "minimum": 1,
+        "title": "Max Bytes",
+        "type": "integer"
+      },
+      "offset": {
+        "default": 0,
+        "description": "Zero-based number of lines to skip.",
+        "minimum": 0,
+        "title": "Offset",
+        "type": "integer"
+      },
+      "count": {
+        "anyOf": [
+          {
+            "maximum": 1000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": 200,
+        "description": "Maximum lines returned; null reads all remaining lines within max_bytes.",
+        "title": "Count"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "title": "Encoding",
+        "type": "string"
+      },
+      "detected": {
+        "title": "Detected",
+        "type": "boolean"
+      },
+      "text": {
+        "description": "Selected lines with original newline characters preserved.",
+        "title": "Text",
+        "type": "string"
+      },
+      "offset": {
+        "title": "Offset",
+        "type": "integer"
+      },
+      "lines_returned": {
+        "title": "Lines Returned",
+        "type": "integer"
+      },
+      "total_lines": {
+        "title": "Total Lines",
+        "type": "integer"
+      },
+      "next_offset": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "title": "Next Offset"
+      }
+    },
+    "required": [
+      "path",
+      "encoding",
+      "detected",
+      "text",
+      "offset",
+      "lines_returned",
+      "total_lines",
+      "next_offset"
+    ],
+    "title": "ReadResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "example.txt",
+        "encoding": "auto",
+        "offset": 0,
+        "count": 100
+      },
+      "output": {
+        "path": "/example.txt",
+        "encoding": "utf-8",
+        "detected": true,
+        "text": "Hello\n",
+        "offset": 0,
+        "lines_returned": 1,
+        "total_lines": 1,
+        "next_offset": null
+      }
+    }
+  ]
+}

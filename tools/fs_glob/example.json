@@ -1,0 +1,6 @@
+{
+  "path": ".",
+  "pattern": "**/*.py",
+  "type": "file",
+  "limit": 100
+}

@@ -1,0 +1,112 @@
+{
+  "format_version": "1.8",
+  "name": "fs_delete",
+  "version": "0.5.0",
+  "description": "Remove a file or directory, requiring explicit recursive deletion.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "recursive": {
+        "default": false,
+        "description": "Required for non-empty directories; symlinks and workspace root are refused.",
+        "title": "Recursive",
+        "type": "boolean"
+      },
+      "missing_ok": {
+        "default": false,
+        "description": "Succeed if the path does not exist.",
+        "title": "Missing Ok",
+        "type": "boolean"
+      },
+      "dry_run": {
+        "default": false,
+        "description": "Validate and report the target without removing it.",
+        "title": "Dry Run",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_delete.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "operation": {
+        "title": "Operation",
+        "type": "string"
+      },
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "source": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Source"
+      },
+      "changed": {
+        "title": "Changed",
+        "type": "boolean"
+      },
+      "bytes_written": {
+        "anyOf": [
+          {
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "default": null,
+        "title": "Bytes Written"
+      }
+    },
+    "required": [
+      "operation",
+      "path",
+      "changed"
+    ],
+    "title": "MutationResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_delete.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "example-copy.txt",
+        "dry_run": true
+      },
+      "output": {
+        "operation": "delete",
+        "path": "/example-copy.txt",
+        "source": null,
+        "changed": false,
+        "bytes_written": null
+      }
+    }
+  ]
+}

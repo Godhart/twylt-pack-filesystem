@@ -1,0 +1,100 @@
+{
+  "format_version": "1.8",
+  "name": "fs_chmod",
+  "version": "0.5.0",
+  "description": "Set exact POSIX permissions on one workspace file or directory.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "mode": {
+        "description": "Exact POSIX octal mode, e.g. 644, 0755 or 0640; no symbolic or recursive mode.",
+        "pattern": "^[0-7]{3,4}$",
+        "title": "Mode",
+        "type": "string"
+      },
+      "dry_run": {
+        "default": false,
+        "description": "Report requested mode without applying it.",
+        "title": "Dry Run",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "path",
+      "mode"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_chmod.input",
+    "x-schema-version": "1.0.0"
+  },
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "previous_mode": {
+        "title": "Previous Mode",
+        "type": "string"
+      },
+      "requested_mode": {
+        "title": "Requested Mode",
+        "type": "string"
+      },
+      "mode": {
+        "description": "Actual current mode after operation, or original mode for dry_run.",
+        "title": "Mode",
+        "type": "string"
+      },
+      "changed": {
+        "title": "Changed",
+        "type": "boolean"
+      },
+      "dry_run": {
+        "title": "Dry Run",
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "path",
+      "previous_mode",
+      "requested_mode",
+      "mode",
+      "changed",
+      "dry_run"
+    ],
+    "title": "ChmodResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_chmod.output",
+    "x-schema-version": "1.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "example.txt",
+        "mode": "0644"
+      },
+      "output": {
+        "path": "/example.txt",
+        "previous_mode": "0600",
+        "requested_mode": "0644",
+        "mode": "0644",
+        "changed": true,
+        "dry_run": false
+      }
+    }
+  ]
+}

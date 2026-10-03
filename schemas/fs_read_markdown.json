@@ -1,0 +1,91 @@
+{
+  "format_version": "1.8",
+  "name": "fs_read_markdown",
+  "version": "0.5.0",
+  "description": "Parse CommonMark plus tables and strikethrough into a nested token AST.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "auto",
+        "description": "Python codec name or auto (BOM, strict UTF-8, then heuristic detector).",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "max_bytes": {
+        "default": 16777216,
+        "description": "Maximum entire source file size to decode, even for a line slice.",
+        "maximum": 67108864,
+        "minimum": 1,
+        "title": "Max Bytes",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read_markdown.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "title": "Encoding",
+        "type": "string"
+      },
+      "nodes": {
+        "description": "Nested markdown-it token AST; source line ranges are zero-based, end-exclusive.",
+        "items": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "type": "object"
+        },
+        "title": "Nodes",
+        "type": "array"
+      }
+    },
+    "required": [
+      "path",
+      "encoding",
+      "nodes"
+    ],
+    "title": "MarkdownResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read_markdown.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "README.md"
+      },
+      "output": {
+        "path": "/README.md",
+        "encoding": "utf-8",
+        "nodes": []
+      }
+    }
+  ]
+}

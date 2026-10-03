@@ -1,0 +1,103 @@
+{
+  "format_version": "1.8",
+  "name": "fs_read_jyt",
+  "version": "0.5.0",
+  "description": "Read JSON, YAML or TOML into a JSON-compatible data structure.",
+  "requirements": {
+    "tool": "pip",
+    "format": "requirements.txt",
+    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+  },
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "description": "Virtual POSIX path relative to configured workspace root; / is the workspace, not the host root.",
+        "minLength": 1,
+        "title": "Path",
+        "type": "string"
+      },
+      "encoding": {
+        "default": "auto",
+        "description": "Python codec name or auto (BOM, strict UTF-8, then heuristic detector).",
+        "title": "Encoding",
+        "type": "string"
+      },
+      "max_bytes": {
+        "default": 16777216,
+        "description": "Maximum entire source file size to decode, even for a line slice.",
+        "maximum": 67108864,
+        "minimum": 1,
+        "title": "Max Bytes",
+        "type": "integer"
+      },
+      "format": {
+        "default": "auto",
+        "description": "auto uses the filename extension .json/.yaml/.yml/.toml.",
+        "enum": [
+          "auto",
+          "json",
+          "yaml",
+          "toml"
+        ],
+        "title": "Format",
+        "type": "string"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "title": "InputTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read_jyt.input",
+    "x-schema-version": "2.0.0"
+  },
+  "outputSchema": {
+    "$defs": {
+      "JsonValue": {}
+    },
+    "additionalProperties": false,
+    "properties": {
+      "path": {
+        "title": "Path",
+        "type": "string"
+      },
+      "format": {
+        "title": "Format",
+        "type": "string"
+      },
+      "encoding": {
+        "title": "Encoding",
+        "type": "string"
+      },
+      "data": {
+        "$ref": "#/$defs/JsonValue"
+      }
+    },
+    "required": [
+      "path",
+      "format",
+      "encoding",
+      "data"
+    ],
+    "title": "JytResultTWYLTStrict",
+    "type": "object",
+    "$id": "fs_read_jyt.output",
+    "x-schema-version": "2.0.0"
+  },
+  "few_shots": [
+    {
+      "input": {
+        "path": "settings.yaml"
+      },
+      "output": {
+        "path": "/settings.yaml",
+        "format": "yaml",
+        "encoding": "utf-8",
+        "data": {
+          "enabled": true
+        }
+      }
+    }
+  ]
+}

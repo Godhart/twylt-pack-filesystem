@@ -1,0 +1,10 @@
+{
+  "path": ".",
+  "name_regex": "\\.py$",
+  "type": "file",
+  "max_depth": 3,
+  "content": {
+    "query": "TODO",
+    "ignore_case": true
+  }
+}
