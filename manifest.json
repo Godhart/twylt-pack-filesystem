@@ -1,6 +1,6 @@
 {
-  "name": "filesystem-twylt-pack",
-  "version": "0.5.0",
+  "name": "twylt-pack-filesystem",
+  "version": "0.6.0",
   "protocol": "TWYLT 1",
   "tools": [
     {

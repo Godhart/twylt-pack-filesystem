@@ -7,7 +7,7 @@ import sys
 import pytest
 
 BASE = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(BASE/'src'))
+sys.path.insert(0, str(BASE/'tests/legacy'))
 import common as fs
 
 @pytest.fixture(autouse=True)
@@ -241,10 +241,10 @@ def test_describe_and_schemas(folder,tmp_path):
     p=subprocess.run([sys.executable,str(folder/'run.py'),'{"describe":"json_spec"}'],cwd=tmp_path,capture_output=True,text=True)
     assert p.returncode==0,p.stderr
     spec=json.loads(p.stdout)
-    assert spec['name']==folder.name and spec['version']=='0.5.0'
+    assert spec['name']==folder.name and spec['version']=='0.6.0'
     assert spec['inputSchema']['additionalProperties'] is False
     assert spec['outputSchema']['properties']
-    assert spec['requirements']['content'].startswith('twylt==1.0.0')
+    assert spec['requirements']['content'].startswith('twylt>=1.1.1,<2')
     assert spec['few_shots']
     p=subprocess.run([sys.executable,str(folder/'run.py'),'{"unexpected":1}'],cwd=tmp_path,capture_output=True,text=True)
     assert p.returncode!=0
@@ -276,13 +276,15 @@ run_tool_file(sys.argv[1])
 """
     process=subprocess.run([sys.executable,'-c',code,str(BASE/'tools/fs_read/tool.py')],env={**os.environ,'INPUT_DESCRIBE':'requirements'},capture_output=True,text=True,cwd=tmp_path)
     assert process.returncode==0,process.stderr+process.stdout
-    assert 'twylt==1.0.0' in process.stdout
+    assert 'twylt>=1.1.1,<2' in process.stdout
 
 
 def test_file_io_and_standalone(tmp_path):
     import shutil
     standalone=tmp_path/'tool.py'
-    shutil.copy2(BASE/'tools/fs_write/tool.py',standalone)
+    shutil.copytree(BASE/'tools', tmp_path/'pack/tools')
+    shutil.copytree(BASE/'shared', tmp_path/'pack/shared')
+    standalone=tmp_path/'pack/tools/fs_write/tool.py'
     (tmp_path/'input.json').write_text(json.dumps({'path':'out.txt','content':'standalone'}))
     process=subprocess.run([sys.executable,str(standalone)],stdin=subprocess.DEVNULL,capture_output=True,text=True,cwd=tmp_path)
     assert process.returncode==0,process.stderr+process.stdout

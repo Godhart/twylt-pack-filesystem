@@ -5,7 +5,7 @@ import subprocess
 import sys
 import pytest
 BASE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(BASE/'src'))
+sys.path.insert(0,str(BASE/'tests/legacy'))
 import common as fs
 
 @pytest.fixture
@@ -98,7 +98,7 @@ def test_new_operations_policy(root,tmp_path):
     (root/'link').symlink_to(outside)
     for op,data in [('stat',{'path':'/link'}),('chmod',{'path':'/link','mode':'777'}),('chmod',{'path':'../outside','mode':'777'})]:
         p=subprocess.run([sys.executable,str(BASE/'tools'/('fs_'+op)/'run.py'),json.dumps(data)],capture_output=True,text=True)
-        assert p.returncode==5,p.stderr
+        assert p.returncode==6,p.stderr
     assert outside.read_text()=='keep' and outside.stat().st_mode & 0o777==0o600
     events=[json.loads(s) for s in (tmp_path/'audit.jsonl').read_text().splitlines()]
     assert len(events)==3 and {e['tool'] for e in events}=={'fs_stat','fs_chmod'}

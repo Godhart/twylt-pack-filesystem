@@ -5,7 +5,7 @@ import subprocess
 import sys
 import pytest
 BASE=Path(__file__).resolve().parents[1]
-sys.path.insert(0,str(BASE/'src'))
+sys.path.insert(0,str(BASE/'tests/legacy'))
 import common as fs
 
 @pytest.fixture

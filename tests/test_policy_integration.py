@@ -21,7 +21,7 @@ def setup_env(tmp_path):
 def test_every_tool_requires_root(tool,tmp_path):
     env={**os.environ};env.pop('TWYLT_WORKSPACE_ROOT',None);env.pop('TWYLT_INCIDENT_LOG',None);env.pop('INPUT_DESCRIBE',None)
     result=call(tool.name,json.loads((tool/'example.json').read_text()),env)
-    assert result.returncode==5 and not result.stdout
+    assert result.returncode==6 and not result.stdout
     event=json.loads(result.stderr.splitlines()[0])
     assert event['code']=='workspace_not_configured' and event['tool']==tool.name
     described=call(tool.name,{'describe':'json_spec'},env)
@@ -32,7 +32,7 @@ def test_every_tool_checks_log_before_business(tool,tmp_path):
     root,log,env=setup_env(tmp_path)
     env['TWYLT_INCIDENT_LOG']=str(tmp_path/'absent'/'audit.jsonl')
     result=call(tool.name,json.loads((tool/'example.json').read_text()),env)
-    assert result.returncode==5
+    assert result.returncode==6
     assert json.loads(result.stderr.splitlines()[0])['code']=='incident_log_unavailable'
     assert list(root.iterdir())==[]
 
@@ -54,7 +54,7 @@ def test_virtual_operations_and_incidents(tmp_path):
            ('fs_write_jyt',{'path':'/link/a.json','data':{'secret':'payload'}})]
     for op,data in cases:
         result=call(op,data,env)
-        assert result.returncode==5 and not result.stdout
+        assert result.returncode==6 and not result.stdout
     records=[json.loads(s) for s in log.read_text().splitlines()]
     assert len(records)==len(cases) and 'secret payload' not in log.read_text()
     assert all(record['incident_id'] for record in records)
@@ -68,7 +68,7 @@ def test_recursive_symlink_rejected_before_mutation(tmp_path,op):
     (source/'nested').mkdir();(source/'nested/link').symlink_to(tmp_path)
     data={'path':'/source','recursive':True} if op=='fs_delete' else {'source':'/source','destination':'/dest'}
     result=call(op,data,env)
-    assert result.returncode==5 and (source/'file').read_text()=='keep' and not (root/'dest').exists()
+    assert result.returncode==6 and (source/'file').read_text()=='keep' and not (root/'dest').exists()
     assert json.loads(log.read_text())['code']=='symlink_forbidden'
 
 
@@ -77,11 +77,11 @@ def test_file_transport_cannot_escape(tmp_path):
     tool=TOOLS[0]
     (tmp_path/'output.json').write_text('keep outside')
     p=subprocess.run([sys.executable,str(tool/'run.py')],cwd=tmp_path,stdin=subprocess.DEVNULL,env=env,text=True,capture_output=True)
-    assert p.returncode==4 and (tmp_path/'output.json').read_text()=='keep outside'
-    assert json.loads(log.read_text())['code']=='transport_cwd_outside_workspace'
+    assert p.returncode==6 and (tmp_path/'output.json').read_text()=='keep outside'
+    assert json.loads(log.read_text())['code']=='transport_cwd_or_path_outside_allowed_roots'
     log.write_text('')
     target=tmp_path/'outside';target.write_text('keep target')
     (root/'output.json').symlink_to(target)
     p=subprocess.run([sys.executable,str(tool/'run.py')],cwd=root,stdin=subprocess.DEVNULL,env=env,text=True,capture_output=True)
-    assert p.returncode==4 and target.read_text()=='keep target' and (root/'output.json').is_symlink()
+    assert p.returncode==6 and target.read_text()=='keep target' and (root/'output.json').is_symlink()
     assert json.loads(log.read_text())['code']=='symlink_forbidden'

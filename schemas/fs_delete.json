@@ -1,12 +1,12 @@
 {
   "format_version": "1.8",
   "name": "fs_delete",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Remove a file or directory, requiring explicit recursive deletion.",
   "requirements": {
     "tool": "pip",
     "format": "requirements.txt",
-    "content": "twylt==1.0.0\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
+    "content": "twylt>=1.1.1,<2\npydantic>=2,<3\nPyYAML>=6,<7\ntomli-w>=1,<2\nmarkdown-it-py>=3,<5\ncharset-normalizer>=3,<4\n"
   },
   "inputSchema": {
     "additionalProperties": false,
